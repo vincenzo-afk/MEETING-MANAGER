@@ -40,14 +40,52 @@ function Toast({ message, type, onDismiss }) {
   );
 }
 
+// Extracted stateless Field component
+const Field = ({ label, name, type = 'text', placeholder, required, maxLength, inputmode, pattern, hint, form, errors, onChange }) => (
+  <div>
+    <label className="label">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
+    <input
+      id={`field-${name}`}
+      name={name}
+      type={type}
+      value={form[name]}
+      onChange={onChange}
+      placeholder={placeholder}
+      maxLength={maxLength}
+      inputMode={inputmode}
+      pattern={pattern}
+      className={`input ${errors[name] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+    />
+    {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
+    {hint && !errors[name] && <p className="text-gray-400 text-xs mt-1">{hint}</p>}
+  </div>
+);
+
+// Extracted stateless TextArea component
+const TextArea = ({ label, name, placeholder, maxLength, form, onChange }) => (
+  <div>
+    <label className="label">{label}</label>
+    <textarea
+      id={`field-${name}`}
+      name={name}
+      value={form[name]}
+      onChange={onChange}
+      placeholder={placeholder}
+      rows={3}
+      maxLength={maxLength}
+      className="input resize-y min-h-[80px]"
+    />
+  </div>
+);
+
 export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange }) {
   const [form, setForm]           = useState(EMPTY);
   const [errors, setErrors]       = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false); // BUG #1
-  const [toast, setToast]         = useState(null);        // BUG #2
-  const [isDirty, setIsDirty]     = useState(false);       // BUG #3 & #16
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast]         = useState(null);
+  const [isDirty, setIsDirty]     = useState(false);
 
-  // BUG #16 fallback: at least block window unload
+  // Fallback: at least block window unload
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (isDirty) {
@@ -68,7 +106,7 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
   const onChange = e => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
     setIsDirty(true);
-    onDirtyChange?.(true); // notify Scheduler parent (BUG #3)
+    onDirtyChange?.(true);
   };
 
   const validate = () => {
@@ -76,7 +114,6 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
     if (!form.title.trim())      errs.title      = 'Meeting title is required';
     if (!form.date)              errs.date       = 'Date is required';
     if (!form.clientName.trim()) errs.clientName = 'Client name is required';
-    // BUG #18: phone validation
     if (form.inchargePh && !/^[\d\s\+\-\(\)]{7,15}$/.test(form.inchargePh.trim())) {
       errs.inchargePh = 'Enter a valid phone number';
     }
@@ -89,7 +126,7 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (isSubmitting) return; // BUG #1: guard double-submit
+    if (isSubmitting) return;
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
@@ -97,10 +134,10 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
     try {
       if (editData) {
         updateMeeting(editData.id, form);
-        showToast('Meeting updated successfully!', 'success'); // BUG #2
+        showToast('Meeting updated successfully!', 'success');
       } else {
         addMeeting({ ...form, id: uuidv4() });
-        showToast('Meeting saved successfully!', 'success'); // BUG #2
+        showToast('Meeting saved successfully!', 'success');
       }
       setForm(EMPTY);
       setIsDirty(false);
@@ -111,7 +148,6 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
     }
   };
 
-  // BUG #3: Warn before hiding form when editing and dirty
   const handleCancel = () => {
     if (isDirty && editData) {
       if (!window.confirm('You have unsaved changes. Discard them?')) return;
@@ -121,46 +157,8 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
     onCancel?.();
   };
 
-  const Field = ({ label, name, type = 'text', placeholder, required, maxLength, inputmode, pattern, hint }) => (
-    <div>
-      <label className="label">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
-      <input
-        id={`field-${name}`}
-        name={name}
-        type={type}
-        value={form[name]}
-        onChange={onChange}
-        placeholder={placeholder}
-        maxLength={maxLength} // BUG #8
-        inputMode={inputmode}
-        pattern={pattern}
-        className={`input ${errors[name] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
-      />
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
-      {hint && !errors[name] && <p className="text-gray-400 text-xs mt-1">{hint}</p>}
-    </div>
-  );
-
-  const TextArea = ({ label, name, placeholder, maxLength }) => (
-    <div>
-      <label className="label">{label}</label>
-      {/* BUG #21: allow resize-y instead of resize-none */}
-      <textarea
-        id={`field-${name}`}
-        name={name}
-        value={form[name]}
-        onChange={onChange}
-        placeholder={placeholder}
-        rows={3}
-        maxLength={maxLength}
-        className="input resize-y min-h-[80px]"
-      />
-    </div>
-  );
-
   return (
     <>
-      {/* BUG #2: Toast notification */}
       {toast && (
         <Toast
           key={toast.key}
@@ -178,8 +176,7 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
             Meeting Info
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* BUG #8: maxLength on title */}
-            <Field label="Meeting Title" name="title" placeholder="e.g. Project Kickoff" required maxLength={80} />
+            <Field label="Meeting Title" name="title" placeholder="e.g. Project Kickoff" required maxLength={80} form={form} errors={errors} onChange={onChange} />
             <div>
               <label className="label">Status</label>
               <select id="field-status" name="status" value={form.status} onChange={onChange} className="input">
@@ -189,21 +186,19 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
               </select>
             </div>
             <div>
-              <Field label="Date" name="date" type="date" required />
-              {/* BUG #15: Warn on past dates */}
+              <Field label="Date" name="date" type="date" required form={form} errors={errors} onChange={onChange} />
               {form.date && isDateInPast(form.date) && (
                 <p className="text-amber-600 text-xs mt-1 flex items-center gap-1">
                   ⚠️ This date is in the past. Meeting will appear as Overdue.
                 </p>
               )}
             </div>
-            <Field label="Time" name="time" type="time" />
+            <Field label="Time" name="time" type="time" form={form} errors={errors} onChange={onChange} />
             <div className="sm:col-span-2">
-              {/* BUG #22: participants placeholder guidance */}
-              <Field label="Participants" name="participants" placeholder="e.g. John, Mary, Ravi (comma-separated)" maxLength={200} />
+              <Field label="Participants" name="participants" placeholder="e.g. John, Mary, Ravi (comma-separated)" maxLength={200} form={form} errors={errors} onChange={onChange} />
             </div>
             <div className="sm:col-span-2">
-              <TextArea label="Agenda" name="agenda" placeholder="Meeting agenda or key topics..." maxLength={1000} />
+              <TextArea label="Agenda" name="agenda" placeholder="Meeting agenda or key topics..." maxLength={1000} form={form} onChange={onChange} />
             </div>
           </div>
         </div>
@@ -215,10 +210,8 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
             Client Details
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* BUG #8: maxLength on clientName */}
-            <Field label="Client Name" name="clientName" placeholder="e.g. ABC Corp" required maxLength={80} />
-            <Field label="Incharge Name" name="inchargeName" placeholder="e.g. Ravi Kumar" maxLength={80} />
-            {/* BUG #18: phone input with numeric inputmode + pattern */}
+            <Field label="Client Name" name="clientName" placeholder="e.g. ABC Corp" required maxLength={80} form={form} errors={errors} onChange={onChange} />
+            <Field label="Incharge Name" name="inchargeName" placeholder="e.g. Ravi Kumar" maxLength={80} form={form} errors={errors} onChange={onChange} />
             <Field
               label="Incharge Ph.No"
               name="inchargePh"
@@ -228,9 +221,9 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
               pattern="[\d\s\+\-\(\)]{7,15}"
               maxLength={15}
               hint="Digits only, 7–15 characters"
+              form={form} errors={errors} onChange={onChange}
             />
-            {/* BUG #24: address word-break handled in TextArea */}
-            <Field label="Address" name="address" placeholder="City, State" maxLength={200} />
+            <Field label="Address" name="address" placeholder="City, State" maxLength={200} form={form} errors={errors} onChange={onChange} />
           </div>
         </div>
 
@@ -241,15 +234,14 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
             Business Info
           </p>
           <div className="grid grid-cols-1 gap-4">
-            <Field label="RM Requirement" name="rmRequirement" placeholder="e.g. 2 BHK near metro" maxLength={200} />
-            <TextArea label="Business Details" name="businessDetails" placeholder="Commercial or residential details..." maxLength={1000} />
-            <TextArea label="Remarks" name="remarks" placeholder="Follow-up notes, special instructions..." maxLength={500} />
+            <Field label="RM Requirement" name="rmRequirement" placeholder="e.g. 2 BHK near metro" maxLength={200} form={form} errors={errors} onChange={onChange} />
+            <TextArea label="Business Details" name="businessDetails" placeholder="Commercial or residential details..." maxLength={1000} form={form} onChange={onChange} />
+            <TextArea label="Remarks" name="remarks" placeholder="Follow-up notes, special instructions..." maxLength={500} form={form} onChange={onChange} />
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          {/* BUG #1: disabled during submit */}
           <button
             type="submit"
             disabled={isSubmitting}
