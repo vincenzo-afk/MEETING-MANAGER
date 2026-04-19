@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans antialiased;
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,102,241,0.15), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(79,70,229,0.08), transparent);
+  }
+}
+
+@layer components {
+  /* Card */
+  .card {
+    @apply bg-slate-900/70 backdrop-blur-sm border border-slate-800/60 rounded-2xl;
+  }
+  .card-hover {
+    @apply card transition-all duration-300 hover:border-brand-500/40 hover:shadow-lg hover:shadow-brand-500/10;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-500 
+           text-white font-semibold rounded-xl transition-all duration-200 
+           shadow-lg shadow-brand-600/30 hover:shadow-brand-500/40 
+           active:scale-95 select-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700
+           text-slate-200 font-medium rounded-xl border border-slate-700 hover:border-slate-600
+           transition-all duration-200 active:scale-95 select-none;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/40 
+           text-red-400 hover:text-red-300 font-medium rounded-lg border border-red-600/30
+           transition-all duration-200 active:scale-95 select-none text-sm;
+  }
+  .btn-success {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 
+           text-white font-semibold rounded-xl transition-all duration-200 
+           shadow-lg shadow-emerald-600/30 hover:shadow-emerald-500/40 
+           active:scale-95 select-none;
+  }
+  .btn-edit {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/40 
+           text-amber-400 hover:text-amber-300 font-medium rounded-lg border border-amber-500/30
+           transition-all duration-200 active:scale-95 select-none text-sm;
+  }
+
+  /* Form inputs */
+  .input {
+    @apply w-full px-4 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl
+           text-slate-100 placeholder-slate-500
+           focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20
+           transition-all duration-200;
+  }
+  .label {
+    @apply block text-sm font-medium text-slate-400 mb-1.5;
+  }
+
+  /* Section title */
+  .section-title {
+    @apply text-xs font-bold uppercase tracking-widest text-brand-400 mb-4 flex items-center gap-2;
+  }
+
+  /* Status badges */
+  .badge-upcoming  { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30; }
+  .badge-completed { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30; }
+  .badge-cancelled { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-slate-900; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-600; }
+}
