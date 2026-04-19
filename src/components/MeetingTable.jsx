@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deleteMeeting } from '../utils/storage';
 import { formatDate, formatTime, deriveStatus } from '../utils/formatters';
@@ -88,7 +88,7 @@ export default function MeetingTable({ meetings, onEdit, onRefresh, filterStatus
             {filtered.map((m, idx) => {
               const displayStatus = deriveStatus(m); // BUG #7
               return (
-                <>
+                <React.Fragment key={m.id}>
                   <tr
                     key={m.id}
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
@@ -144,7 +144,7 @@ export default function MeetingTable({ meetings, onEdit, onRefresh, filterStatus
                       onCancel={() => setConfirmDelete(null)}
                     />
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </tbody>

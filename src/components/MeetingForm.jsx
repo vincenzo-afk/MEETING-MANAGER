@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useBlocker } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { addMeeting, updateMeeting, getLocalDateString } from '../utils/storage';
 
 const EMPTY = {
@@ -47,11 +47,17 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
   const [toast, setToast]         = useState(null);        // BUG #2
   const [isDirty, setIsDirty]     = useState(false);       // BUG #3 & #16
 
-  // BUG #16: Block navigation when form has unsaved changes
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      isDirty && currentLocation.pathname !== nextLocation.pathname
-  );
+  // BUG #16 fallback: at least block window unload
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   useEffect(() => {
     setForm(editData ? editData : EMPTY);
@@ -114,19 +120,6 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
     setIsDirty(false);
     onCancel?.();
   };
-
-  // BUG #16: Blocker confirmation UI
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      const proceed = window.confirm('You have unsaved changes. Leave anyway?');
-      if (proceed) {
-        setIsDirty(false);
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
-    }
-  }, [blocker]);
 
   const Field = ({ label, name, type = 'text', placeholder, required, maxLength, inputmode, pattern, hint }) => (
     <div>
