@@ -6,13 +6,6 @@ import { exportAllMeetingsExcel } from '../utils/excelExport';
 import MeetingCard from '../components/MeetingCard';
 import ExportButton from '../components/ExportButton';
 
-function StatusBadge({ status }) {
-  if (status === 'Completed') return <span className="badge-completed">✅</span>;
-  if (status === 'Cancelled') return <span className="badge-cancelled">❌</span>;
-  if (status === 'Overdue')   return <span className="badge-overdue">🔴</span>;
-  return <span className="badge-upcoming">🔵</span>;
-}
-
 export default function Report() {
   // BUG #13: persist selectedId via URL query param ?id=...
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,7 +34,7 @@ export default function Report() {
     if (urlId && meetings.find(m => m.id === urlId)) {
       setSelectedId(urlId);
     }
-  }, []);
+  }, [meetings, searchParams]);
 
   const selected = meetings.find(m => m.id === selectedId) || null;
 

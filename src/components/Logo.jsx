@@ -1,4 +1,4 @@
-export default function Logo({ className = "w-8 h-8", textColor = "text-blue-600" }) {
+export default function Logo({ className = "w-8 h-8" }) {
   return (
     <div className="flex items-center gap-3">
       <svg

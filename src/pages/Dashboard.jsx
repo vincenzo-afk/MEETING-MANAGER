@@ -63,7 +63,7 @@ export default function Dashboard() {
       {/* Today's meetings */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          📅 <span>Today's Meetings</span>
+          📅 <span>Today&apos;s Meetings</span>
           <span className="text-sm font-normal text-gray-500">({todaysMeetings.length})</span>
         </h2>
 

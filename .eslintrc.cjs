@@ -16,5 +16,7 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    // Components are plain JavaScript; runtime prop-types are not used in this project.
+    'react/prop-types': 'off',
   },
 }

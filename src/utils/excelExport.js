@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 
 // BUG #11: Sanitize filename — strip chars that break file paths
 function slugify(str) {
-  return (str || '').replace(/[^a-zA-Z0-9 \-]/g, '').trim().replace(/\s+/g, '_') || 'Unknown';
+  return (str || '').replace(/[^a-zA-Z0-9 -]/g, '').trim().replace(/\s+/g, '_') || 'Unknown';
 }
 
 // BUG #12: Parse ISO date to JS Date so SheetJS writes a real date cell

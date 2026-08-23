@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useLocation } from 'react-router-dom';
 import { addMeeting, updateMeeting, getLocalDateString } from '../utils/storage';
 
 const EMPTY = {
@@ -114,7 +113,7 @@ export default function MeetingForm({ editData, onSave, onCancel, onDirtyChange 
     if (!form.title.trim())      errs.title      = 'Meeting title is required';
     if (!form.date)              errs.date       = 'Date is required';
     if (!form.clientName.trim()) errs.clientName = 'Client name is required';
-    if (form.inchargePh && !/^[\d\s\+\-\(\)]{7,15}$/.test(form.inchargePh.trim())) {
+    if (form.inchargePh && !/^[\d\s+\-()]{7,15}$/.test(form.inchargePh.trim())) {
       errs.inchargePh = 'Enter a valid phone number';
     }
     return errs;
